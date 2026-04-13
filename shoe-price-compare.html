@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shoe Price Compare</title>
+  <link rel="preconnect" href="https://api.fontshare.com" />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@500,700,800&display=swap" rel="stylesheet" />
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9; --color-surface-offset: #edeae5; --color-border: #d4d1ca;
+      --color-text: #28251d; --color-text-muted: #6f6b63; --color-text-faint: #9e9a93; --color-text-inverse: #f9f8f4;
+      --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-primary-highlight: #cedcd8;
+      --color-success: #437a22; --color-warning: #964219; --color-error: #a12c7b;
+      --radius-sm: 0.375rem; --radius-md: 0.75rem; --radius-lg: 1rem; --radius-full: 9999px;
+      --shadow-sm: 0 1px 2px rgb(40 37 29 / 0.06); --shadow-md: 0 10px 30px rgb(40 37 29 / 0.08);
+      --font-body: 'General Sans', Arial, sans-serif; --font-display: 'Cabinet Grotesk', Arial, sans-serif;
+      --content: 1200px;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d; --color-surface-offset: #22211f; --color-border: #393836;
+      --color-text: #e4e2de; --color-text-muted: #b3afa8; --color-text-faint: #7d7973; --color-text-inverse: #171614;
+      --color-primary: #4f98a3; --color-primary-hover: #227f8b; --color-primary-highlight: #313b3b;
+      --color-success: #7fbd5c; --color-warning: #cf8a61; --color-error: #de7aba;
+      --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.2); --shadow-md: 0 10px 30px rgb(0 0 0 / 0.35);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; font-family: var(--font-body); font-size: var(--text-base); background: var(--color-bg); color: var(--color-text); line-height: 1.6; }
+    h1,h2,h3 { margin: 0; line-height: 1.1; }
+    p { margin: 0; color: var(--color-text-muted); }
+    a { color: inherit; }
+    button, input, select { font: inherit; }
+    .container { width: min(calc(100% - 2rem), var(--content)); margin: 0 auto; }
+    .topbar { position: sticky; top: 0; z-index: 20; backdrop-filter: blur(16px); background: color-mix(in srgb, var(--color-bg) 84%, transparent); border-bottom: 1px solid var(--color-border); }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) 0; }
+    .brand { display: flex; align-items: center; gap: var(--space-3); font-weight: 700; }
+    .logo { width: 36px; height: 36px; border-radius: 12px; background: linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 55%, white)); display: grid; place-items: center; color: white; box-shadow: var(--shadow-sm); }
+    .logo svg { width: 20px; height: 20px; }
+    .nav-actions { display: flex; gap: var(--space-3); align-items: center; }
+    .theme-btn, .ghost-btn, .primary-btn { border: 1px solid var(--color-border); border-radius: var(--radius-full); padding: 0.8rem 1rem; background: var(--color-surface); color: var(--color-text); cursor: pointer; }
+    .primary-btn { background: var(--color-primary); color: var(--color-text-inverse); border-color: transparent; }
+    .primary-btn:hover { background: var(--color-primary-hover); }
+    .hero { padding: var(--space-12) 0 var(--space-8); }
+    .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: var(--space-8); align-items: start; }
+    .eyebrow { display: inline-flex; gap: var(--space-2); align-items: center; border-radius: var(--radius-full); padding: 0.35rem 0.7rem; background: var(--color-primary-highlight); color: var(--color-primary); font-size: var(--text-sm); font-weight: 600; margin-bottom: var(--space-4); }
+    .hero h1 { font-family: var(--font-display); font-size: var(--text-2xl); max-width: 10ch; margin-bottom: var(--space-4); }
+    .hero-copy { max-width: 60ch; margin-bottom: var(--space-6); }
+    .search-panel, .results-panel, .insight-card, .source-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); }
+    .search-panel { padding: var(--space-5); display: grid; gap: var(--space-4); }
+    .search-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: var(--space-3); }
+    .field { display: grid; gap: 0.35rem; }
+    .field label { font-size: var(--text-sm); color: var(--color-text); font-weight: 600; }
+    .field input, .field select { width: 100%; border: 1px solid var(--color-border); background: var(--color-surface-2); color: var(--color-text); border-radius: var(--radius-md); padding: 0.9rem 1rem; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+    .metric { padding: var(--space-4); border-radius: var(--radius-lg); background: var(--color-surface-offset); }
+    .metric .label { font-size: var(--text-sm); color: var(--color-text-muted); }
+    .metric strong { display: block; font-size: var(--text-lg); margin-top: 0.25rem; }
+    .section { padding: var(--space-6) 0; }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+    .section-head h2 { font-family: var(--font-display); font-size: var(--text-xl); }
+    .results-panel { overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+    th { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 600; background: var(--color-surface-2); }
+    tbody tr:hover { background: color-mix(in srgb, var(--color-primary-highlight) 35%, transparent); }
+    .price { font-weight: 700; }
+    .deal.good { color: var(--color-success); }
+    .deal.warn { color: var(--color-warning); }
+    .tag { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.65rem; border-radius: var(--radius-full); background: var(--color-surface-offset); font-size: var(--text-xs); color: var(--color-text-muted); }
+    .insight-grid, .source-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+    .insight-card, .source-card { padding: var(--space-5); }
+    .source-card p strong { color: var(--color-text); }
+    .footer { padding: var(--space-10) 0 var(--space-12); color: var(--color-text-muted); }
+    .muted { color: var(--color-text-muted); }
+    .tiny { font-size: var(--text-xs); color: var(--color-text-faint); }
+    .stack { display: grid; gap: var(--space-3); }
+    @media (max-width: 900px) {
+      .hero-grid, .search-grid, .insight-grid, .source-grid, .metrics { grid-template-columns: 1fr; }
+      .section-head { align-items: start; flex-direction: column; }
+      .topbar-inner { align-items: start; flex-direction: column; }
+      th:nth-child(4), td:nth-child(4), th:nth-child(5), td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand" aria-label="SoleScout home">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 15c4.5 0 5.7-6 10.5-6 1.8 0 3.3.6 5.5 2.2"/>
+            <path d="M3 18.5c2.4-.5 4.7-.7 6.8-.4 2 .3 3.7 1 5.4 1 2.1 0 4-.9 5.8-2.1"/>
+          </svg>
+        </div>
+        <div>
+          <div>SoleScout</div>
+          <div class="tiny">Shoe price comparison workspace</div>
+        </div>
+      </div>
+      <div class="nav-actions">
+        <button class="theme-btn" type="button" data-theme-toggle aria-label="Toggle theme">🌙</button>
+        <a class="ghost-btn" href="#sources">Retail sources</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Compare prices fast</div>
+          <h1>Find the best place to buy your next pair of shoes.</h1>
+          <p class="hero-copy">This starter app lets you search a shoe model, compare offers across retailers, sort by price, and spot whether a deal is strong, average, or weak. It ships with example data now, and it is structured so you can later wire it to scraped feeds, affiliate APIs, or manual CSV imports.</p>
+          <div class="metrics">
+            <div class="metric"><span class="label">Cheapest offer</span><strong id="metric-lowest">$120.00</strong></div>
+            <div class="metric"><span class="label">Highest offer</span><strong id="metric-highest">$160.00</strong></div>
+            <div class="metric"><span class="label">Potential savings</span><strong id="metric-savings">$40.00</strong></div>
+          </div>
+        </div>
+        <aside class="search-panel" aria-label="Search and filter shoes">
+          <div class="stack">
+            <h2 style="font-size: var(--text-lg); font-family: var(--font-body);">Search shoes</h2>
+            <p>Use this front end as your repo starter. Replace the sample inventory with live retailer data later.</p>
+          </div>
+          <div class="search-grid">
+            <div class="field">
+              <label for="shoeSearch">Shoe or keyword</label>
+              <input id="shoeSearch" type="text" placeholder="Nike Vomero 18" />
+            </div>
+            <div class="field">
+              <label for="categoryFilter">Category</label>
+              <select id="categoryFilter">
+                <option value="all">All</option>
+                <option value="Running">Running</option>
+                <option value="Basketball">Basketball</option>
+                <option value="Lifestyle">Lifestyle</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="sortBy">Sort by</label>
+              <select id="sortBy">
+                <option value="price-asc">Lowest price</option>
+                <option value="price-desc">Highest price</option>
+                <option value="discount-desc">Biggest discount</option>
+              </select>
+            </div>
+            <div class="field" style="align-self:end;">
+              <button class="primary-btn" id="applyFilters" type="button">Refresh</button>
+            </div>
+          </div>
+          <div class="tiny">Suggested next step: connect this UI to a JSON feed that normalizes retailer, model, size availability, sale price, MSRP, and outbound URL.</div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Live comparison layout</h2>
+            <p>The table ranks offers from cheapest to most expensive and flags the strongest discount.</p>
+          </div>
+          <span class="tag"><span id="resultCount">6</span> offers tracked</span>
+        </div>
+        <div class="results-panel">
+          <table>
+            <thead>
+              <tr>
+                <th>Retailer</th>
+                <th>Model</th>
+                <th>Price</th>
+                <th>MSRP</th>
+                <th>Discount</th>
+                <th>Category</th>
+                <th>Deal signal</th>
+              </tr>
+            </thead>
+            <tbody id="resultsBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>What to plug in next</h2>
+            <p>This version is intentionally static so you can commit it immediately and iterate from a working baseline.</p>
+          </div>
+        </div>
+        <div class="insight-grid">
+          <article class="insight-card stack">
+            <span class="tag">Data model</span>
+            <h3>Normalize each offer</h3>
+            <p>Track retailer, product name, price, MSRP, sizes, shipping cost, and destination URL in one schema so every site compares cleanly.</p>
+          </article>
+          <article class="insight-card stack">
+            <span class="tag">Automation</span>
+            <h3>Add a scraper or API layer</h3>
+            <p>Use Apify, retailer feeds, or an n8n workflow that refreshes a JSON file on a schedule and redeploys the app.</p>
+          </article>
+          <article class="insight-card stack">
+            <span class="tag">Monetization</span>
+            <h3>Track clicks and affiliate links</h3>
+            <p>Attach outbound click analytics, coupon codes, and affiliate IDs once you have reliable retailer coverage.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="sources">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Reference sources</h2>
+            <p>These are example sources that informed the direction for a shoe comparison experience.</p>
+          </div>
+        </div>
+        <div class="source-grid">
+          <article class="source-card stack">
+            <h3>RunningShoeDeals</h3>
+            <p><strong>Why it matters:</strong> It presents US shoe price comparison across 75+ retailers, which validates the multi-retailer comparison model.</p>
+            <a href="https://www.runningshoedeals.com" target="_blank" rel="noopener noreferrer">Visit source</a>
+          </article>
+          <article class="source-card stack">
+            <h3>Best Shoe Price</h3>
+            <p><strong>Why it matters:</strong> It frames the experience around comparing retailer offers and ranking the best offer first.</p>
+            <a href="https://bestshoeprice.com" target="_blank" rel="noopener noreferrer">Visit source</a>
+          </article>
+          <article class="source-card stack">
+            <h3>TheeShoeFinder</h3>
+            <p><strong>Why it matters:</strong> It shows a sneaker-focused version that compares marketplaces like StockX, GOAT, Flight Club, and Farfetch.</p>
+            <a href="https://theeshoefinder.com" target="_blank" rel="noopener noreferrer">Visit source</a>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container stack">
+      <div>Built as a static starter for your repository.</div>
+      <div class="tiny">To make it live, connect the <code>inventory</code> array below to your real feed or generated JSON endpoint.</div>
+    </div>
+  </footer>
+
+  <script>
+    const inventory = [
+      { retailer: 'Running Warehouse', model: 'Nike Vomero 18', price: 120, msrp: 150, category: 'Running' },
+      { retailer: 'Dick\'s Sporting Goods', model: 'Nike Vomero 18', price: 130, msrp: 150, category: 'Running' },
+      { retailer: 'Foot Locker', model: 'Nike Vomero 18', price: 145, msrp: 150, category: 'Running' },
+      { retailer: 'GOAT', model: 'Air Jordan 4 Retro', price: 160, msrp: 215, category: 'Basketball' },
+      { retailer: 'StockX', model: 'Air Jordan 4 Retro', price: 152, msrp: 215, category: 'Basketball' },
+      { retailer: 'Nordstrom', model: 'New Balance 9060', price: 150, msrp: 150, category: 'Lifestyle' },
+      { retailer: 'Kith', model: 'New Balance 9060', price: 155, msrp: 150, category: 'Lifestyle' },
+      { retailer: 'Zappos', model: 'Brooks Ghost 16', price: 110, msrp: 140, category: 'Running' },
+      { retailer: 'Road Runner Sports', model: 'Brooks Ghost 16', price: 118, msrp: 140, category: 'Running' }
+    ];
+
+    const els = {
+      body: document.getElementById('resultsBody'),
+      count: document.getElementById('resultCount'),
+      lowest: document.getElementById('metric-lowest'),
+      highest: document.getElementById('metric-highest'),
+      savings: document.getElementById('metric-savings'),
+      search: document.getElementById('shoeSearch'),
+      category: document.getElementById('categoryFilter'),
+      sortBy: document.getElementById('sortBy')
+    };
+
+    function currency(value) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value); }
+    function discountPercent(item) { return Math.max(0, Math.round(((item.msrp - item.price) / item.msrp) * 100)); }
+    function dealSignal(discount) {
+      if (discount >= 20) return { label: 'Strong deal', className: 'good' };
+      if (discount >= 8) return { label: 'Decent savings', className: 'warn' };
+      return { label: 'Near retail', className: '' };
+    }
+
+    function applyFilters() {
+      const q = els.search.value.trim().toLowerCase();
+      const category = els.category.value;
+      const sortBy = els.sortBy.value;
+
+      let rows = inventory.filter(item => {
+        const matchesQuery = !q || item.model.toLowerCase().includes(q) || item.retailer.toLowerCase().includes(q);
+        const matchesCategory = category === 'all' || item.category === category;
+        return matchesQuery && matchesCategory;
+      }).map(item => ({ ...item, discount: discountPercent(item) }));
+
+      rows.sort((a, b) => {
+        if (sortBy === 'price-desc') return b.price - a.price;
+        if (sortBy === 'discount-desc') return b.discount - a.discount;
+        return a.price - b.price;
+      });
+
+      render(rows);
+    }
+
+    function render(rows) {
+      els.body.innerHTML = '';
+      rows.forEach(item => {
+        const signal = dealSignal(item.discount);
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${item.retailer}</strong></td>
+          <td>${item.model}</td>
+          <td class="price">${currency(item.price)}</td>
+          <td>${currency(item.msrp)}</td>
+          <td>${item.discount}% off</td>
+          <td>${item.category}</td>
+          <td class="deal ${signal.className}">${signal.label}</td>
+        `;
+        els.body.appendChild(tr);
+      });
+
+      els.count.textContent = rows.length;
+      if (!rows.length) {
+        els.body.innerHTML = '<tr><td colspan="7">No matching offers yet. Try another search or category.</td></tr>';
+        els.lowest.textContent = '$0.00';
+        els.highest.textContent = '$0.00';
+        els.savings.textContent = '$0.00';
+        return;
+      }
+      const prices = rows.map(r => r.price);
+      els.lowest.textContent = currency(Math.min(...prices));
+      els.highest.textContent = currency(Math.max(...prices));
+      els.savings.textContent = currency(Math.max(...prices) - Math.min(...prices));
+    }
+
+    document.getElementById('applyFilters').addEventListener('click', applyFilters);
+    ['input', 'change'].forEach(eventName => {
+      els.search.addEventListener(eventName, applyFilters);
+      els.category.addEventListener(eventName, applyFilters);
+      els.sortBy.addEventListener(eventName, applyFilters);
+    });
+
+    (function () {
+      const toggle = document.querySelector('[data-theme-toggle]');
+      const root = document.documentElement;
+      let dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      root.setAttribute('data-theme', dark ? 'dark' : 'light');
+      toggle.textContent = dark ? '☀️' : '🌙';
+      toggle.addEventListener('click', () => {
+        dark = !dark;
+        root.setAttribute('data-theme', dark ? 'dark' : 'light');
+        toggle.textContent = dark ? '☀️' : '🌙';
+      });
+    }());
+
+    applyFilters();
+  </script>
+</body>
+</html>
